@@ -1,8 +1,8 @@
 /* DXナビ（dx-apps）共通 service worker
    アプリを更新・追加したら VERSION を必ず変える（例 a→b、日付更新）。新しいアプリは APPS に slug を追加する。
    キャッシュ名は "dxnavi-" で始める。同じドメインの病棟アプリ（ward-apps）のキャッシュには触らない。 */
-const VERSION = "dxnavi-2026-11-16c";
-const APPS = ["ks", "nq", "rh", "tn", "qs"];
+const VERSION = "dxnavi-2026-11-16d";
+const APPS = ["ks", "nq", "rh", "tn", "qs", "ms"];
 const ROOT = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "apple-touch-icon.png"];
 const PER_APP = ["", "index.html", "app.enc", "icon-192.png", "icon-512.png", "apple-touch-icon.png"];
 const ASSETS = ROOT.concat(...APPS.map((a) => PER_APP.map((f) => a + "/" + f)));

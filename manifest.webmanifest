@@ -53,6 +53,18 @@
       ]
     },
     {
+      "name": "MISAT 知識確認テスト",
+      "short_name": "MISATテスト",
+      "url": "ms/",
+      "icons": [
+        {
+          "src": "ms/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
       "name": "自主トレ指導シート",
       "short_name": "自主トレ",
       "url": "rh/",
