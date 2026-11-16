@@ -58,7 +58,7 @@ function putKey(salt,k){return kv("readwrite",function(s){return s.put(k,salt)})
 function delKey(salt){return kv("readwrite",function(s){return s.delete(salt)}).catch(function(){})}
 function derive(pass,enc){return crypto.subtle.importKey("raw",new TextEncoder().encode(norm(pass)),"PBKDF2",false,["deriveKey"]).then(function(base){return crypto.subtle.deriveKey({name:"PBKDF2",hash:"SHA-256",salt:b64d(enc.salt),iterations:enc.it},base,{name:"AES-GCM",length:256},false,["decrypt"])})}
 function dec(key,enc){var p={name:"AES-GCM",iv:b64d(enc.iv)};if(enc.aad)p.additionalData=new TextEncoder().encode(enc.aad);return crypto.subtle.decrypt(p,key,b64d(enc.ct)).then(function(b){return new TextDecoder().decode(b)})}
-function show(html,k){try{window.__DXKEY={salt:ENC.salt,key:k}}catch(e){}document.open();document.write(html);document.close()}
+function show(html,k){try{window.__DXKEY={salt:ENC.salt,key:k}}catch(e){}var tg='<script src="../share.js"><\/script>';html=/<\/body>/i.test(html)?html.replace(/<\/body>(?![\s\S]*<\/body>)/i,tg+'<\/body>'):html+tg;document.open();document.write(html);document.close()}
 function lock(msg){$("st").style.display="none";$("f").style.display="block";$("err").textContent=msg||"";setTimeout(function(){$("pw").focus()},50)}
 var ENC=null;
 if(!window.crypto||!crypto.subtle){$("st").textContent="この環境では暗号機能が使えません（https で開いてください）";return}
@@ -78,5 +78,6 @@ $("f").addEventListener("submit",function(e){
 });
 })();
 </script>
+<script src="../share.js" defer></script>
 </body>
 </html>

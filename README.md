@@ -23,6 +23,7 @@ DX推進室で作成した業務支援ツールを、1つのPWA「DXナビ」に
 - `index.html` … 入口（ツール一覧）。新しいツールは一覧に1行追加
 - `manifest.webmanifest` … 唯一の manifest（id/start_url/scope は ./、shortcuts に各ツール）
 - `tools/` … 暗号化・復号スクリプトとローダーのひな形（秘密情報は含まない）
+- `share.js` … 共通のQR表示（右上「QR」ボタン。病棟アプリと同じ）。入口は index.html の </body> 直前で読み込み、各ツールはローダー（tools/loader.html 由来）が入力画面と復号後の中身の両方に読み込む
 - `sw.js` … 唯一の service worker。キャッシュ名は `dxnavi-` で始め、ward-apps のキャッシュには触らない
 - `<slug>/index.html`（ローダー）・`<slug>/app.enc`（暗号化した中身）とアイコン3つ … 各ツール。ツール側に manifest・service worker は置かない
 
