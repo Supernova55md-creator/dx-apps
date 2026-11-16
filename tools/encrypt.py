@@ -5,6 +5,7 @@
     AES-256-GCM（鍵は PBKDF2-SHA256・60万回）で暗号化し <repo>/<slug>/app.enc に書く。
   - salt は DXナビ全体で1つ（<src>/SALT.txt、無ければ作る）。端末は1回の入力で全ツールを開ける。
   - <repo>/<slug>/index.html はローダー（tools/loader.html から生成）に置き換える。
+  - <src>/<slug>/enc/ の付属データ（画像など）も <repo>/<slug>/enc/<name>.enc に暗号化する。
   - パスフレーズの正規化（JS側と同じ）：NFKC → カタカナをひらがなに → 空白・「・」を除く。
 """
 import sys,os,json,base64,secrets,hashlib,unicodedata,re
@@ -36,4 +37,13 @@ def main(src,repo):
         out=loader.replace('{{TITLE}}',title).replace('{{SHORT}}',short).replace('{{COLOR}}',color)
         open(os.path.join(repo,slug,'index.html'),'w',encoding='utf-8').write(out)
         print('encrypted',slug,len(html),'bytes')
+        # 付属データ：<src>/<slug>/enc/<name> → <repo>/<slug>/enc/<name>.enc（aad は "<slug>/enc/<name>"）
+        ed=os.path.join(src,slug,'enc')
+        if os.path.isdir(ed):
+            os.makedirs(os.path.join(repo,slug,'enc'),exist_ok=True)
+            for nm in sorted(os.listdir(ed)):
+                data=open(os.path.join(ed,nm),'rb').read(); iv=secrets.token_bytes(12); aad=f'{slug}/enc/{nm}'
+                ct=AESGCM(key).encrypt(iv,data,aad.encode())
+                json.dump({"v":1,"kdf":"PBKDF2-SHA256","it":ITER,"salt":base64.b64encode(salt).decode(),"iv":base64.b64encode(iv).decode(),"aad":aad,"ct":base64.b64encode(ct).decode()},open(os.path.join(repo,slug,'enc',nm+'.enc'),'w'))
+            print('  assets',slug,len(os.listdir(ed)))
 if __name__=='__main__': main(sys.argv[1],sys.argv[2])

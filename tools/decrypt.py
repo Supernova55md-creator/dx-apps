@@ -20,3 +20,11 @@ for slug in sorted(os.listdir(repo)):
     open(os.path.join(out,slug,'index.html'),'wb').write(html)
     open(os.path.join(out,'SALT.txt'),'w').write(e['salt'])
     print('decrypted',slug)
+    ed=os.path.join(repo,slug,'enc')
+    if os.path.isdir(ed):
+        os.makedirs(os.path.join(out,slug,'enc'),exist_ok=True)
+        for nm in sorted(os.listdir(ed)):
+            if not nm.endswith('.enc'): continue
+            a=json.load(open(os.path.join(ed,nm)))
+            data=AESGCM(k).decrypt(base64.b64decode(a['iv']),base64.b64decode(a['ct']),a['aad'].encode())
+            open(os.path.join(out,slug,'enc',nm[:-4]),'wb').write(data)
