@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#b5452f">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="QC審査">
+<title>第26回TQM発表大会 審査ナビ</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;background:#f5f5fb;color:#1f2430;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:calc(20px + env(safe-area-inset-top)) 20px calc(20px + env(safe-area-inset-bottom))}
+.box{width:100%;max-width:380px;text-align:center}
+img{width:72px;height:72px;border-radius:18px}
+h1{font-size:18px;margin:12px 0 4px}
+p{font-size:13px;color:#626879;margin:4px 0 14px;line-height:1.6}
+form{display:none}
+input[type=password],input[type=text]{width:100%;font:inherit;font-size:16px;padding:12px;border-radius:12px;border:1.5px solid #d4d6e3;background:#fff}
+input:focus{outline:none;border-color:#b5452f}
+label{display:flex;gap:6px;align-items:center;justify-content:center;font-size:13px;color:#626879;margin:10px 0}
+button{width:100%;font:inherit;font-size:16px;font-weight:700;padding:12px;border:0;border-radius:12px;background:#b5452f;color:#fff}
+button:disabled{opacity:.6}
+#err{color:#c62828;font-size:13px;min-height:20px;margin-top:8px}
+#st{font-size:13px;color:#626879}
+a{color:#626879;font-size:12.5px}
+</style>
+</head>
+<body>
+<div class="box">
+<img src="icon-192.png" alt="">
+<h1>第26回TQM発表大会 審査ナビ</h1>
+<div id="st">読み込み中…</div>
+<form id="f" autocomplete="on">
+<p>DXナビの中身は暗号化しています。<br>パスフレーズを入れてください（空白はあってもなくても可）。</p>
+<input type="text" name="username" value="DXナビ" autocomplete="username" hidden>
+<input type="password" id="pw" autocomplete="current-password" placeholder="パスフレーズ" aria-label="パスフレーズ">
+<label><input type="checkbox" id="rem" checked>この端末で記憶する（次回から入力不要）</label>
+<button id="go" type="submit">開く</button>
+<div id="err" role="alert"></div>
+<a href="../">DXナビの一覧へ</a>
+</form>
+</div>
+<script>
+(function(){
+"use strict";
+var $=function(i){return document.getElementById(i)};
+function b64d(s){var b=atob(s),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u}
+function norm(p){p=p.normalize("NFKC");p=p.replace(/[ァ-ヶ]/g,function(c){return String.fromCharCode(c.charCodeAt(0)-0x60)});return p.replace(/[\s・･]/g,"")}
+function idb(){return new Promise(function(res,rej){var r=indexedDB.open("dxnavi",1);r.onupgradeneeded=function(){r.result.createObjectStore("keys")};r.onsuccess=function(){res(r.result)};r.onerror=function(){rej(r.error)}})}
+function kv(mode,fn){return idb().then(function(db){return new Promise(function(res,rej){var t=db.transaction("keys",mode),s=t.objectStore("keys"),q=fn(s);t.oncomplete=function(){res(q&&q.result)};t.onerror=function(){rej(t.error)}})})}
+function getKey(salt){return kv("readonly",function(s){return s.get(salt)}).catch(function(){return null})}
+function putKey(salt,k){return kv("readwrite",function(s){return s.put(k,salt)}).catch(function(){})}
+function delKey(salt){return kv("readwrite",function(s){return s.delete(salt)}).catch(function(){})}
+function derive(pass,enc){return crypto.subtle.importKey("raw",new TextEncoder().encode(norm(pass)),"PBKDF2",false,["deriveKey"]).then(function(base){return crypto.subtle.deriveKey({name:"PBKDF2",hash:"SHA-256",salt:b64d(enc.salt),iterations:enc.it},base,{name:"AES-GCM",length:256},false,["decrypt"])})}
+function dec(key,enc){var p={name:"AES-GCM",iv:b64d(enc.iv)};if(enc.aad)p.additionalData=new TextEncoder().encode(enc.aad);return crypto.subtle.decrypt(p,key,b64d(enc.ct)).then(function(b){return new TextDecoder().decode(b)})}
+function show(html){document.open();document.write(html);document.close()}
+function lock(msg){$("st").style.display="none";$("f").style.display="block";$("err").textContent=msg||"";setTimeout(function(){$("pw").focus()},50)}
+var ENC=null;
+if(!window.crypto||!crypto.subtle){$("st").textContent="この環境では暗号機能が使えません（https で開いてください）";return}
+fetch("app.enc",{cache:"no-cache"}).then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(enc){
+  ENC=enc;
+  return getKey(enc.salt).then(function(k){
+    if(!k){lock();return}
+    return dec(k,enc).then(show,function(){delKey(enc.salt);lock("パスフレーズが変わりました。新しいパスフレーズを入れてください")});
+  });
+}).catch(function(){$("st").textContent="読み込めませんでした。通信状態を確認して開き直してください"});
+$("f").addEventListener("submit",function(e){
+  e.preventDefault();if(!ENC)return;var pw=$("pw").value;if(!norm(pw)){lock("パスフレーズを入れてください");return}
+  $("go").disabled=true;$("go").textContent="確認中…";$("err").textContent="";
+  derive(pw,ENC).then(function(k){return dec(k,ENC).then(function(html){
+    var p=$("rem").checked?putKey(ENC.salt,k):Promise.resolve();return p.then(function(){show(html)})})
+  }).catch(function(){$("go").disabled=false;$("go").textContent="開く";lock("パスフレーズが違います")});
+});
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+{
+  "id": "./",
+  "name": "DXナビ",
+  "short_name": "DXナビ",
+  "lang": "ja",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f5f5fb",
+  "theme_color": "#3730a3",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "看護師勤務表メーカー",
+      "short_name": "勤務表",
+      "url": "ks/",
+      "icons": [
+        {
+          "src": "ks/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "看護手順 確認テスト",
+      "short_name": "確認テスト",
+      "url": "nq/",
+      "icons": [
+        {
+          "src": "nq/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "自主トレ指導シート",
+      "short_name": "自主トレ",
+      "url": "rh/",
+      "icons": [
+        {
+          "src": "rh/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "院内手続きナビ",
+      "short_name": "手続きナビ",
+      "url": "tn/",
+      "icons": [
+        {
+          "src": "tn/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "QC発表大会 審査ナビ",
+      "short_name": "QC審査",
+      "url": "qs/",
+      "icons": [
+        {
+          "src": "qs/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}

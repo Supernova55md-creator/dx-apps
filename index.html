@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#3730a3">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DXナビ">
+<title>DXナビ</title>
+<style>
+:root{--acc:#3730a3;--bg:#f5f5fb;--ink:#1f2430;--sub:#626879;--line:#e2e3ee;--font:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic UI","Meiryo",system-ui,sans-serif}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);line-height:1.5;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+header{background:var(--acc);color:#fff;padding:calc(14px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) 14px calc(16px + env(safe-area-inset-left));position:sticky;top:0;z-index:2}
+header h1{margin:0;font-size:21px}header p{margin:2px 0 0;font-size:12.5px;opacity:.9}
+main{max-width:760px;margin:0 auto;padding:8px calc(14px + env(safe-area-inset-right)) 8px calc(14px + env(safe-area-inset-left))}
+h2{font-size:14px;color:var(--acc);margin:18px 2px 6px}
+ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+li a{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 12px;color:inherit;text-decoration:none}
+li img{width:48px;height:48px;border-radius:12px;flex:none}
+li b{display:block;font-size:16px}li small{display:block;font-size:12.5px;color:var(--sub)}
+li i{margin-left:auto;font-style:normal;color:var(--sub);font-size:20px}
+.note{font-size:12.5px;color:var(--sub);background:#fff;border:1px dashed var(--line);border-radius:12px;padding:10px 12px;margin-top:18px}
+</style>
+</head>
+<body>
+<header><h1>DXナビ</h1><p>DX推進室の業務支援ツール（試作）</p></header>
+<main>
+<h2>看護</h2><ul><li><a href="ks/"><img src="ks/icon-192.png" alt=""><span><b>看護師勤務表メーカー</b><small>ヒアリング → ルール → 名簿 → 自動作成</small></span><i>›</i></a></li><li><a href="nq/"><img src="nq/icon-192.png" alt=""><span><b>看護手順 確認テスト</b><small>手順書から作った確認問題と正答率の集計</small></span><i>›</i></a></li></ul><h2>リハ</h2><ul><li><a href="rh/"><img src="rh/icon-192.png" alt=""><span><b>自主トレ指導シート</b><small>運動を選んで配布用シートを印刷</small></span><i>›</i></a></li></ul><h2>事務</h2><ul><li><a href="tn/"><img src="tn/icon-192.png" alt=""><span><b>院内手続きナビ</b><small>用件から書式・提出先・締切を案内</small></span><i>›</i></a></li></ul><h2>TQM・QC</h2><ul><li><a href="qs/"><img src="qs/icon-192.png" alt=""><span><b>QC発表大会 審査ナビ</b><small>第26回TQM発表大会：抄録要点・5項目採点・集計</small></span><i>›</i></a></li></ul>
+<div class="note" id="lockNote"><b>暗号化について</b>：各ツールの中身は暗号化して置いています。最初に開くときにDXナビ共通のパスフレーズを入れると、この端末に鍵を記憶し、以後は入力不要です（鍵は取り出せない形で端末内に保存）。<br><span id="lockSt"></span> <button id="lockClr" type="button" style="font:inherit;font-size:12.5px;border:1px solid var(--line);background:#fff;border-radius:8px;padding:4px 10px;margin-top:6px">この端末の鍵を消す</button></div>
+<div class="note">入力した内容はこの端末の中だけに保存され、サーバーには送りません。患者の氏名・IDなど個人を特定できる情報は入力しないでください。各ツールの説明データ（手順・規程・運動など）には、デモ用のサンプルを含みます。</div>
+</main>
+<div id="swNote" role="status" style="display:none;position:fixed;left:12px;right:12px;bottom:calc(76px + env(safe-area-inset-bottom));z-index:9;background:#1f2430;color:#fff;border-radius:10px;padding:10px 12px;font-size:14px">新しい版を取り込みました。次に開いたときに反映されます。</div>
+<script>
+(function(){
+  try{
+    var h=location.hostname;
+    var okProto=location.protocol==="https:"||h==="localhost"||h==="127.0.0.1";
+    if(!okProto||/(^|\.)claude\.ai$/.test(h)||/claudeusercontent|claude\.site/.test(h)||!("serviceWorker" in navigator))return;
+    navigator.serviceWorker.register("sw.js",{scope:"./"}).then(function(reg){
+      reg.addEventListener("updatefound",function(){
+        var nw=reg.installing;if(!nw)return;
+        nw.addEventListener("statechange",function(){
+          if(nw.state==="installed"&&navigator.serviceWorker.controller){var n=document.getElementById("swNote");n.style.display="block";setTimeout(function(){n.style.display="none";},6000);}
+        });
+      });
+    }).catch(function(){});
+  }catch(e){}
+})();
+</script>
+<script>
+(function(){
+  var st=document.getElementById("lockSt"),bt=document.getElementById("lockClr"),arm=false;
+  function op(){return new Promise(function(res,rej){var r=indexedDB.open("dxnavi",1);r.onupgradeneeded=function(){r.result.createObjectStore("keys")};r.onsuccess=function(){res(r.result)};r.onerror=function(){rej(r.error)}})}
+  function count(){op().then(function(db){var q=db.transaction("keys").objectStore("keys").count();q.onsuccess=function(){st.textContent=q.result?"この端末：鍵を記憶済み":"この端末：未登録（ツールを開くとパスフレーズを聞かれます）"}}).catch(function(){st.textContent=""})}
+  bt.addEventListener("click",function(){
+    if(!arm){arm=true;bt.textContent="もう一度押すと消します";setTimeout(function(){arm=false;bt.textContent="この端末の鍵を消す"},3000);return}
+    op().then(function(db){var t=db.transaction("keys","readwrite");t.objectStore("keys").clear();t.oncomplete=function(){arm=false;bt.textContent="この端末の鍵を消す";count()}});
+  });
+  try{count()}catch(e){}
+})();
+</script>
+</body>
+</html>
